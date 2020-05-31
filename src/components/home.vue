@@ -43,16 +43,16 @@ export default {
               spotifyObj.getFollowedArtists(body,function (err, data) {
                 if (err) console.error(err);
                 else {
+                      for (let x of data.artists.items){
+                          artists.push(x)
+                      }
                   if (tempCursorArr.includes(data.artists.cursors.after) || data.artists.cursors.after === null){
                     console.log(tempCursorArr)
                     return tempCursorArr
                   }
                   else{ 
-                      tempCursorArr.push(data.artists.cursors.after) 
-                      for (let x of data.artists.items){
-                          artists.push(x)
-                      }
                       
+                  tempCursorArr.push(data.artists.cursors.after)                       
                   return recursiveGetFollowed(data.artists.cursors.after)
                   }
                 }
