@@ -1,19 +1,19 @@
 <template>
-<div>
-<button v-on:click="getAccessCode">Click to receive code</button>
-<button v-on:click="getAccessToken">Click to receive token</button>
+<div >
 <button v-on:click="getFollowedArtist">Get your followed artists</button>
-<ul>
-  <li v-for="artist in artists" :key="artist">
+  <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+  <div v-for="artist in artists" :key="artist.name" >
+    <div style="padding-right: 10px">
+    <img :src="artist.images[0].url" height="50px" width="50px"/>
+    <br>
     {{artist}}
-  </li>
-</ul>
+    </div>
+  </div>
+</div>
 </div>
 </template>
 
 <script>
-import * as SpotifyWebApi from 'spotify-web-api-js';
-let s = new SpotifyWebApi();
 export default {
   name: 'home',
   data(){
@@ -21,15 +21,17 @@ export default {
       authCode : null,
       accessToken: null,
       artists: [],
-      seenCursors : []
+      seenCursors : [],
+      genres: new Set()
     }
   },
   created(){
-    console.log(this.$store.state.spotifyObj,"asdfasdf")
   },
   methods: {
     getFollowedArtist(){
       let tempCursorArr = []
+      let spotifyObj =this.$store.state.spotifyObj
+      let artists = this.artists
       let recursiveGetFollowed = function(after = null){
               let body 
               if (after === null) {
@@ -38,7 +40,7 @@ export default {
               else{
                   body = { type: 'artist', limit: 50, after: after}
               }
-              s.getFollowedArtists(body,function (err, data) {
+              spotifyObj.getFollowedArtists(body,function (err, data) {
                 if (err) console.error(err);
                 else {
                   if (tempCursorArr.includes(data.artists.cursors.after) || data.artists.cursors.after === null){
@@ -47,7 +49,10 @@ export default {
                   }
                   else{ 
                       tempCursorArr.push(data.artists.cursors.after) 
-                      console.log(data.artists.cursors.after, tempCursorArr)
+                      for (let x of data.artists.items){
+                          artists.push(x)
+                      }
+                      
                   return recursiveGetFollowed(data.artists.cursors.after)
                   }
                 }
@@ -55,13 +60,6 @@ export default {
       }
       this.seenCursors = recursiveGetFollowed();
     },
-    getAccessCode(){
-      let authUrl = 'https://accounts.spotify.com/authorize?' +'client_id='+ process.env.VUE_APP_SCID +
-          '&response_type=code'+'&redirect_uri='+ process.env.VUE_APP_BASE_URL+'&scope=user-follow-read'
-      let authUrlEncode = encodeURI(authUrl);
-      window.location.href = authUrlEncode;
-    },
-
     getAccessToken(){
 
   }
