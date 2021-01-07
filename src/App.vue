@@ -10,10 +10,7 @@
 <script>
 
 export default {
-  
 
-
-  
 }
 </script>
 
