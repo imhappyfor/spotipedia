@@ -50,8 +50,7 @@ export default {
                     console.log(tempCursorArr)
                     return tempCursorArr
                   }
-                  else{ 
-                      
+                  else{                   
                   tempCursorArr.push(data.artists.cursors.after)                       
                   return recursiveGetFollowed(data.artists.cursors.after)
                   }
